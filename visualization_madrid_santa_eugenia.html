@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html>
+<!--The head section is the title, styling rules, link to other sources and other meta fields -->
+<head>
+    <!--this line defines the encoding type of the web document-->
+    <meta charset='utf-8' />
+    <!--this defines the title of the web page-->
+    <title>Urban Forestry | Santa Eugenia</title>
+    <!--this line controls how our map is displayed in a mobile browser-->
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <!--this two lines import our map from mapbox (first one javascript code and second css stylesheet-->
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.5.0/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.5.0/mapbox-gl.css' rel='stylesheet' />
+
+    <!--here we define the style of our document using css rules-->
+    <style>
+
+        /*this defines the style of the body (ex. font style, font size, etc*/
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: sans-serif;
+            font-size: 14px;
+        }
+        
+        /*this defines the style of the map*/
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+        }
+
+        /*this defines the style spacing of the text legend panel*/
+        li {
+            padding: 3px
+        }
+
+        /*this defines the style for the legend panel features that will be called underneath in the body*/
+        #panel {
+            background: rgba(0,0,0,0.5);
+            width: 250px;
+            border: 1px solid rgba(0,0,0,0.05);
+            position: absolute;
+            right: 16px;
+            top: 16px;
+            box-shadow: 0 0 4px 0 rgba(0,0,0,0.1); 
+            color: rgba(255,255,255,0.9); /*this changes the text color*/
+        }
+
+        #legend {
+            background: rgba(0,0,0,0.5);
+            width: 250px;
+            height: 190px;
+            border: 1px solid rgba(0,0,0,0.05);
+            position: absolute;
+            right: 0px;
+            top: 195px;
+            box-shadow: 0 0 4px 0 rgba(0,0,0,0.1); 
+            color: rgba(255,255,255,0.9); /*this changes the text color*/
+        }
+        
+        /*this defines the style of the legend title*/
+        h4 {
+            /*text-transform: lowercase;*/
+            border-bottom: 1px solid rgba(255,255,255,0.07); /*this changes the line color*/
+            margin:0;
+            padding: 16px;
+        }
+
+        /*this defines the spacing style for each legend text bullets*/
+        ul {
+            list-style-type: none; /*this line turns off the existing bullets*/
+            margin: 0;
+            padding: 16px;
+        }
+
+        /*this defines the style and shape of the legend text bullets*/
+        ul span {
+            width: 10px; /*width of bullet*/
+            height: 10px; /*height of bullet*/
+            display: inline-block; /*this is the bullet as a little square*/
+            margin-right: 8px; /*this sets the space beetween text and bullet*/
+            border-radius: 50%; /*this makes the bullet as a circle*/
+        }
+        
+        /*I can find dd using the developer tools -> elements -> body -> div class -> div class -> dl -> dd */
+        /*this block defines the visual style of the pop up window that appears when I click on one of the restaurants */
+        dd {
+            margin-left : 0; /*this defines the left justification*/
+            
+            margin-bottom : 8px; /*this defines the space from the bottom*/ 
+            font-weight : bold; /*this defines the text weight*/ 
+            color:white;
+        }
+
+        
+
+
+        /*This block defines the text style and size of popup windows that appears when I click on a region*/
+        .mapboxgl-popup-content{
+            font-size: 14px;
+            
+            box-shadow: 0 0 4px 0; 
+            max-width: 260px;
+            max-height: 220px;
+            min-height: 170px;
+            box-shadow: 0 0 4px 0 rgba(0,0,0,0.1); 
+            color: rgb(134, 134, 134);
+            background: rgba(0,0,0,0.9);
+            border-radius: 10px;
+        }
+
+
+        .popup-name {
+            margin-bottom: 8px;
+            width: 180px;
+        }
+
+        .popup-inner {
+            position: relative;
+            top: -130px;
+            right: -170px;
+            width: 150px;
+            
+        }
+
+        .popup-list {
+            position: relative;
+            height: 80px;
+            width: 50px;
+            
+            top: 32px;
+            left: 20px;
+            list-style-type: none;
+            background: rgba(0, 0, 0, 0);
+            transform: rotate(90deg);       
+        }
+
+        .popup-graph-title {
+            position: absolute;
+            color: #747474;
+        }
+
+        /*This block defines the bottom margin of the text inside the popup window*/
+        dl{
+            margin-bottom: 0;
+        }
+
+        /*these blocks undernath define the button style to activate the layers*/
+        #menu {
+            background: rgba(66, 66, 66, 0.5);
+            position: absolute;
+            z-index: 1;
+            top: 65px;
+            left: 10px;
+            border-radius: 3px;
+            width: 225px;
+            border: 1px solid rgba(0, 0, 0, 0.4);
+            
+        }
+
+            /*background: rgba(0,0,0,0.5);
+            width: 310px;
+            border: 1px solid rgba(0,0,0,0.05);
+            position: absolute;
+            right: 16px;
+            top: 16px;
+            box-shadow: 0 0 4px 0 rgba(0,0,0,0.1); 
+            color: rgba(255,255,255,0.9); /*this changes the text color*/
+        
+            
+        #menu a {
+            font-size: 13px;
+            color: rgba(0,0,0,0.5);
+            display: block;
+            margin: 0;
+            padding: 0;
+            padding: 10px;
+            text-decoration: none;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+            text-align: center;
+        }
+            
+        #menu a:last-child {
+            border: none;
+        }
+            
+        #menu a:hover {
+            background-color: #f8f8f8;
+            color: #404040;
+        }
+            
+        #menu a.active {
+            background-color: rgba(0,0,0,0.5);
+            color: #ffffff;
+        }
+            
+        #menu a.active:hover {
+            background:rgba(61, 61, 61, 0.5);
+        }
+
+    </style>
+</head>
+
+<!--The body section contains all the visible elements of the page (ex. map, legend and other elements user interface) -->
+<body>
+    <!--this line is the map-->
+    <!--<nav id="menu"></nav>-->
+    <!--this line is the map-->
+    <div id='map'></div>
+    <div id='panel'>
+        <!--legend title-->
+        <h4>Solar Radiation Level</h4>
+        <ul>
+            <!--elements of the legend-->
+            <!--the span elements create the bullets in front of the text (the bullets features are defined above in the css rules in span-->
+            <li><span style='background: #ac0202;'></span>Higher than 210 W/m<sup>2</li> 
+            <li><span style='background: #ff2e2e;'></span>Between 208 and 210 W/m<sup>2</li> 
+            <li><span style='background: #ff9999;'></span>Between 206 and 208 W/m<sup>2</li> 
+            <li><span style='background: #ffb8b8;'></span>Lower than 206 W/m<sup>2</li> 
+            
+        </ul>
+
+        <div id='legend'>
+            <!--legend title-->
+            <h4>Layers</h4>
+            
+                <!--elements of the legend-->
+                <!--the span elements create the bullets in front of the text (the bullets features are defined above in the css rules in span-->
+                <nav id="menu"></nav>
+                
+        </div>
+
+
+
+
+
+
+
+
+    </div>
+
+    <!--Here between the script marks there is all the javascript code that control the user interaction-->
+    <script>
+
+        mapboxgl.accessToken = 'pk.eyJ1IjoiaWFjb3BvLWRzIiwiYSI6ImNrMzJ1NHBtdzA1b3YzbW55ZTJhbzZtdmgifQ.RcWjOUEo4i7LnQDcbhcPWQ'; // key used to make the link public on github
+        var map = new mapboxgl.Map({
+            container: 'map', // container id
+            style: 'mapbox://styles/iacopo-ds/ckilh4jd91wgk17qvnbx8psxc', // this is the map I created in mapbox
+            center: [-3.615, 40.381], // starting position [lng, lat] 40.381,-3.608
+            zoom: 15, // starting zoom
+            minZoom: 15,
+            maxZoom: 18
+        });
+        
+        /*This block defines the map navigator on the top left of the map*/
+        var nav = new mapboxgl.NavigationControl();
+        map.addControl(nav, 'bottom-right');
+        
+        /*This block makes the mouse change when it is above something that is possible to query*/
+        map.on('mousemove', function (event) {
+            if (map.loaded()) {
+                var features = map.queryRenderedFeatures(event.point, {
+                    layers: ['Trees Dataset Municipality'] /*this is the layer name in the mapbox map */
+                });
+                /*This line is an if statement, ? equals if and : equals else*/
+                map.getCanvas().style.cursor = features.length ? 'pointer' : '';
+            }
+        });
+        
+        /*this block defines the mouse click */
+        map.on('click', function (event) {
+            var geometry = event.point;
+            var parameters = {
+                layers : ['Trees Dataset Municipality'] /*this is the layer name in the mapbox map */
+            };
+            var features = map.queryRenderedFeatures(geometry, parameters);
+            var lot = features[0];
+            console.log(lot);
+
+            /*This if statement is useful to avoid errors in case of clicks where there are no data*/
+            if (features.length>0) {
+                /*these lines select the properties I want to show in the pop up window*/
+                // correggere --> var urbanZone = lot.properties.codzu|| '—';
+                var tree_specie = lot.properties.specie_name || '—';
+                var crown_diameter = lot.properties.crown_diameter || '—';
+                var height = lot.properties.height || '—';
+                var trunk_girth = lot.properties.trunk_girth || '—';
+                
+                console.log(tree_specie);
+
+                /*this creates the pop up (look at mapbox GL JS API for more information) */
+                var popup = new mapboxgl.Popup()
+                    .setLngLat(event.lngLat) /*this is the mouse location */
+                    .setHTML(
+                                               
+                            '<div id="popup"  style="display: block;">' +
+                                '<div class="popup-name">' +
+                                    '<span>' + 
+                                        '<dt>Specie :</dt>' +
+                                        '<dd>' + tree_specie + '</dd>' +
+                                        '<dt>Crown Diameter (m) :</dt>' +
+                                        '<dd>' + crown_diameter + '</dd>' +
+                                        '<dt>Height (m) :</dt>' +
+                                        '<dd>' + height + '</dd>' +
+                                        '<dt>Trunk Girth (m) :</dt>' +
+                                        '<dd>' + trunk_girth + '</dd>' +
+                                        
+                                    '</span>' +                                
+                                '</div>' +                             
+                            '</div>', 
+
+                            )
+
+                    .addTo(map); /*this line adds the pop up to the map */
+            }
+        });
+
+
+
+        // all code underneath is to turn on and off the layers visibility 
+        // enumerate ids of the layers
+        var toggleableLayerIds = ['Trees Dataset Municipality', 'Solar Radiation Intensity', 'Potential Trees Areas'];
+        
+        // set up the corresponding toggle button for each layer
+        for (var i = 0; i < toggleableLayerIds.length; i++) {
+            var id = toggleableLayerIds[i];
+            
+            var link = document.createElement('a');
+            link.href = '#';
+            link.className = 'active';
+            link.textContent = id;
+            
+            link.onclick = function (e) {
+            var clickedLayer = this.textContent;
+            e.preventDefault();
+            e.stopPropagation();
+            
+            var visibility = map.getLayoutProperty(clickedLayer, 'visibility');
+            
+            // toggle layer visibility by changing the layout object's visibility property
+            if (visibility === 'visible') {
+            map.setLayoutProperty(clickedLayer, 'visibility', 'none');
+            this.className = '';
+            } else {
+            this.className = 'active';
+            map.setLayoutProperty(clickedLayer, 'visibility', 'visible');
+            }
+            };
+            
+            var layers = document.getElementById('menu');
+            layers.appendChild(link);
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </script>
+
+</body>
+</html>
